@@ -53,11 +53,15 @@ func formatLog(command string, output  string, level int) []byte {
 	m := GelfMessage{Version:"1.1", Level:level, ShortMessage:shortMessage,
 		Message:output, Command:command}
 	// omit output if message output is empty
-	if b, err := json.Marshal(m); err != nil && output != "" {
+	if b, err := json.Marshal(m); err != nil {
 		log.Fatal(fmt.Sprintf("Failed to Marshal Gelf Message: %s", err))
 		return []byte{}
 	} else {
-		return b
+		if output != "" {
+			return b
+		} else {
+			return []byte{}
+		}
 	}
 }
 
@@ -182,9 +186,9 @@ func main() {
 		exitCode = 1
 	}
 
-	finishedMessage := "Command succeeded"
+	finishedMessage := fmt.Sprintf("Command succeeded: %s", commandStr)
 	if failed {
-		finishedMessage = "Command failed"
+		finishedMessage = fmt.Sprintf("Command failed: %s", commandStr)
 	}
 	if b := formatLogSplit(commandStr, finishedMessage, level, exitCode); len(b) != 0 {
 		g.Send(b)

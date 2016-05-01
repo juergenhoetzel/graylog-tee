@@ -1,0 +1,62 @@
+* Overview
+
+=graylog-tee= is inspired by the Unix =tee= command. It sends the
+process standard output and error output to a graylog server:
+
+#+BEGIN_EXAMPLE
+Usage: graylog-tee [options] command [arg]...
+
+  -logserver string
+    	Graylog Server (default "localhost")
+  -split
+    	if true, split output on newlines
+#+END_EXAMPLE
+
+
+There are two modes of operation
+** Oneshot (default)
+   The command =graylog-tee -logserver pidsley ls -l graylog-tee.go README.org __NO_EXISTENT__= will result in the following =GELF= messages:
+#+BEGIN_EXAMPLE
+{
+   "Version":"1.1",
+   "Level":6,
+   "short_message":"Standard Output",
+   "full_message":"-rw-r--r-- 1 juergen juergen 4952  1. Mai 13:30 graylog-tee.go\n-rw-r--r-- 1 juergen juergen 1029  1. Mai 13:34 README.org",
+   "_pid":0,
+   "_command":"ls -l graylog-tee.go README.org __NO_EXISTENT__"
+}{
+   "Version":"1.1",
+   "Level":4,
+   "short_message":"Standard Error Output",
+   "full_message":"ls: Zugriff auf '__NO_EXISTENT__' nicht möglich: Datei oder Verzeichnis nicht gefunden",
+   "_pid":0,
+   "_command":"ls -l graylog-tee.go README.org __NO_EXISTENT__"
+}
+#+END_EXAMPLE
+** Split lines
+   Each output line is sent in an extra message. The command =graylog-tee -split -logserver pidsley ls -l graylog-tee.go README.org __NO_EXISTENT__= will result in the following =GELF= messages:
+
+#+BEGIN_EXAMPLE
+{
+   "Version":"1.1",
+   "Level":4,
+   "short_message":"ls: Zugriff auf '__NO_EXISTENT__' nicht möglich: Datei oder Verzeichnis nicht gefunden",
+   "full_message":"",
+   "_pid":0,
+   "_command":"ls -l graylog-tee.go README.org __NO_EXISTENT__"
+}{
+   "Version":"1.1",
+   "Level":6,
+   "short_message":"-rw-r--r-- 1 juergen juergen 4951  1. Mai 13:38 graylog-tee.go",
+   "full_message":"",
+   "_pid":0,
+   "_command":"ls -l graylog-tee.go README.org __NO_EXISTENT__"
+}
+   "Version":"1.1",
+   "Level":6,
+   "short_message":"-rw-r--r-- 1 juergen juergen 1325  1. Mai 13:37 README.org",
+   "full_message":"",
+   "_pid":0,
+   "_command":"ls -l graylog-tee.go README.org __NO_EXISTENT__"
+}
+#+END_EXAMPLE

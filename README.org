@@ -2,6 +2,11 @@
 
 =graylog-tee= is inspired by the Unix =tee= command. It sends the
 process standard output and error output to a graylog server:
+* Installation
+
+A simple =Makefile= is provided. Ensure[[https://golang.org/][ Go]] is installed.
+
+* Usage
 
 #+BEGIN_EXAMPLE
 Usage: graylog-tee [options] command [arg]...
@@ -11,7 +16,6 @@ Usage: graylog-tee [options] command [arg]...
   -split
     	if true, split output on newlines
 #+END_EXAMPLE
-
 
 There are two modes of operation
 ** Oneshot (default)
